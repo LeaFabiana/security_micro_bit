@@ -42,8 +42,8 @@ while True:
 
 
     if pin_logo.is_touched():
+
         r = y*5+x
         radio.send(str(r))
-
 
 
