@@ -1,20 +1,22 @@
-# Write your code here :-)
 import radio
 from microbit import *
+import music
 
 radio.on()
-# radio.config(groupe=10)
 
-x = 3
-y = 1
+def check_buttons(x, y):
 
-def mode_select_dot():
-    x = 0
-    y = 0
-    while True:
-        # point navigation
-        display.set_pixel(x, y, 7)
-        if button_a.get_presses():
+    if button_a.is_pressed() or button_b.is_pressed():
+        sleep(700)
+        #music.play(music.JUMP_UP)
+        if button_a.is_pressed() and button_b.is_pressed():
+            music.play(music.JUMP_UP)
+
+            pos_point = y * 5 + x
+            radio.send(str(pos_point))
+            return x, y
+
+        if button_a.is_pressed():
             display.clear()
             if x == 4 and y == 4:
                 x = 0
@@ -25,79 +27,38 @@ def mode_select_dot():
                 x = 0
                 y += 1
 
-        if button_b.get_presses():
+        if button_b.is_pressed():
             display.clear()
             if x == 0 and y == 0:
                 x = 4
                 y = 4
-
             elif x >= 1:
                 x -= 1
             else:
                 x = 4
                 y -= 1
-            # send
-        if pin_logo.is_touched():
-            r = y*5+x
-            radio.send(str(r))
 
-            while True:
-                # wait for response
-                if signal == "enter password":
-                    display.scroll(signal)
-                # response: positive
-                return
-                # if not:
-                break
 
-            return
+        return x, y
 
-        """
-        if signal == "enter password":
-            display.scroll(signal)
-
-        elif signal == 13:
-            return
-        """
-
+    else:
+        return x, y
+x, y = 2, 2
+display.set_pixel(x, y, 7)
 while True:
-    mode_select_dot()
+    # point navigation
 
     signal = radio.receive()
 
+    if signal:
+        display.scroll(signal)
+
+
+
+    x, y = check_buttons(x, y)
     display.set_pixel(x, y, 7)
-    if button_a.get_presses():
-        display.clear()
-        if x == 4 and y == 4:
-            x = 0
-            y = 0
-        elif x <= 3:
-            x += 1
-        elif x == 4:
-            x = 0
-            y += 1
-
-    if button_b.get_presses():
-        display.clear()
-        if x == 0 and y == 0:
-            x = 4
-            y = 4
-
-        elif x >= 1:
-            x -= 1
-        else:
-            x = 4
-            y -= 1
-    #if pin_logo.is_touched():
-        #r = y*5+x
-        #radio.send(str(r))
-
-    #if signal == "enter password":
-        #display.scroll(signal)
 
     if pin_logo.is_touched():
-
-        r = y*5+x
-        radio.send(str(r))
-
+        radio.send("password_over")
+        #music.play(music.BA_DING)
 
